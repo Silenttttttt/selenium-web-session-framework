@@ -8,6 +8,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from enum import Enum
 import traceback
 from typing import List, Optional, Any, Dict
+import time
+import atexit
 
 class SelectorType(Enum):
     """Enum for selector types."""
@@ -29,7 +31,9 @@ class WebSession:
                     chrome_options.add_argument(f"--{key}")
                 elif isinstance(value, str):
                     chrome_options.add_argument(f"--{key}={value}")
+                # Add more specific handling as needed
         self.driver = webdriver.Chrome(options=chrome_options)
+        atexit.register(self.close)
 
 
     def go_to(self, url: str) -> bool:
@@ -409,7 +413,8 @@ class WebSession:
         Returns:
             bool: True if the session is successfully closed.
         """
-        self.driver.quit()
+        if self.driver:
+            self.driver.quit()
         return True
 
     def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10) -> bool:
@@ -467,3 +472,17 @@ class WebSession:
             print(f"Error scrolling: {e}")
             traceback.print_exc()
             return False
+        
+
+    def debug(self) -> None:
+        """
+        Open the browser and wait indefinitely for debugging purposes.
+        """
+        print("Debug mode: Browser is open and waiting indefinitely.")
+        try:
+            while True:
+                time.sleep(100000000)
+        except KeyboardInterrupt:
+            print("Debug mode: Exiting on keyboard interrupt.")
+        finally:
+            self.close()
