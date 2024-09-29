@@ -162,8 +162,13 @@ def example_scroll_to_bottom_of_page(session):
 
 
 def main():
+    # Define options for the browser
+    options = {
+        "headless": False
+    }
+
     # Initialize the web session
-    session = WebSession(headless=False)
+    session = WebSession(options)
     # Perform navigation example
     example_navigation(session)
     time.sleep(5)

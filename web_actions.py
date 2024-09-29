@@ -7,7 +7,7 @@ from selenium.common.exceptions import ElementClickInterceptedException
 from selenium.webdriver.remote.webelement import WebElement
 from enum import Enum
 import traceback
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 
 class SelectorType(Enum):
     """Enum for selector types."""
@@ -15,16 +15,22 @@ class SelectorType(Enum):
     CSS = 'css'
 
 class WebSession:
-    def __init__(self, headless: bool = False) -> None:
+    def __init__(self, options: Optional[Dict[str, Any]] = None) -> None:
         """
         Initialize the WebSession.
         
         Args:
-            headless (bool): Whether to run the browser in headless mode.
+            options (dict): A dictionary of options to configure the browser.
         """
-        options = webdriver.ChromeOptions()
-        options.headless = headless
-        self.driver = webdriver.Chrome(options=options)
+        chrome_options = webdriver.ChromeOptions()
+        if options:
+            for key, value in options.items():
+                if isinstance(value, bool) and value:
+                    chrome_options.add_argument(f"--{key}")
+                elif isinstance(value, str):
+                    chrome_options.add_argument(f"--{key}={value}")
+        self.driver = webdriver.Chrome(options=chrome_options)
+
 
     def go_to(self, url: str) -> bool:
         """
