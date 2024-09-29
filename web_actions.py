@@ -77,16 +77,11 @@ class WebSession:
     def debug(self) -> None:
         """
         Open the browser and wait indefinitely for debugging purposes.
-        To stop this you can use CTRL+C.
-
-        Note:
-            This method will keep the browser open indefinitely.
         """
         print("Debug mode: Browser is open and waiting indefinitely.")
         try:
-            stopped = True
-            while stopped:
-                time.sleep(10)
+            while True:
+                pass
         except KeyboardInterrupt:
             print("Debug mode: Exiting on keyboard interrupt.")
         finally:
@@ -176,7 +171,7 @@ class WebSession:
             print(error_traceback)
             return None
 
-    def find_elements(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> List[WebElement]:
+    def find_elements(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> List[WebElement]:
         """
         Find multiple elements in the DOM.
         
@@ -185,6 +180,7 @@ class WebSession:
             selector (str): The selector string.
             skip_wait (bool): Whether to skip waiting for the elements.
             timeout (int): The maximum time to wait for the elements.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             list: A list of found elements, or an empty list if none are found.
@@ -200,11 +196,12 @@ class WebSession:
             else:
                 return self.wait_for_elements(selector_type, selector, timeout)
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return []
 
-    def click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
+    def click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Click an element.
         
@@ -213,6 +210,7 @@ class WebSession:
             selector (str): The selector string.
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the click is successful, False otherwise.
@@ -223,8 +221,9 @@ class WebSession:
                 return self.safe_click(element)
             return False
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
     def safe_click(self, element: WebElement) -> bool:
@@ -264,7 +263,7 @@ class WebSession:
                     print(error_traceback)
             return False
 
-    def right_click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
+    def right_click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Right-click an element.
         
@@ -273,6 +272,7 @@ class WebSession:
             selector (str): The selector string.
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the right-click is successful, False otherwise.
@@ -285,11 +285,12 @@ class WebSession:
                 return True
             return False
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
-    def type_text(self, selector_type: SelectorType, selector: str, text: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool:
+    def type_text(self, selector_type: SelectorType, selector: str, text: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Type text into an element.
         
@@ -300,6 +301,7 @@ class WebSession:
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
             interactable_timeout (int): The maximum time to wait for the element to be interactable.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the text is successfully typed, False otherwise.
@@ -313,11 +315,12 @@ class WebSession:
                 return True
             return False
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
-    def clear(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool:
+    def clear(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Clear the text in an element.
         
@@ -327,6 +330,7 @@ class WebSession:
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
             interactable_timeout (int): The maximum time to wait for the element to be interactable.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the element is successfully cleared, False otherwise.
@@ -340,11 +344,12 @@ class WebSession:
                 return True
             return False
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
-    def hover(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
+    def hover(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Hover over an element.
         
@@ -353,6 +358,7 @@ class WebSession:
             selector (str): The selector string.
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the hover is successful, False otherwise.
@@ -365,12 +371,12 @@ class WebSession:
                 return True
             return False
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
-
-    def extract(self, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, element: Optional[WebElement] = None, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10) -> Optional[str]:
+    def extract(self, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, element: Optional[WebElement] = None, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> Optional[str]:
         """
         Extract data from an element.
         
@@ -381,27 +387,37 @@ class WebSession:
             attribute (str): The attribute to extract. Use "__text__" to extract the text content.
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             str: The extracted data, or None if extraction fails.
         """
         try:
-            if not element:
-                element = self.find_element(selector_type, selector, skip_wait, timeout)
-            if element:
-                if attribute == "__text__":
-                    return element.text
-                elif attribute:
-                    return element.get_attribute(attribute)
+            if element and selector_type and selector:
+                if selector_type == SelectorType.XPATH:
+                    sub_element = element.find_element(By.XPATH, selector)
+                elif selector_type == SelectorType.CSS:
+                    sub_element = element.find_element(By.CSS_SELECTOR, selector)
                 else:
-                    return element.text
+                    raise ValueError(f"Unsupported selector type: {selector_type}")
+            else:
+                sub_element = element or self.find_element(selector_type, selector, skip_wait, timeout)
+            
+            if sub_element:
+                if attribute == "__text__":
+                    return sub_element.text
+                elif attribute:
+                    return sub_element.get_attribute(attribute)
+                else:
+                    return sub_element.text
             return None
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return None
 
-    def run_js(self, selector_type: SelectorType, selector: str, script: str, skip_wait: bool = False, timeout: int = 10) -> Optional[Any]:
+    def run_js(self, selector_type: SelectorType, selector: str, script: str, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> Optional[Any]:
         """
         Run JavaScript on an element.
         
@@ -411,6 +427,7 @@ class WebSession:
             script (str): The JavaScript code to run.
             skip_wait (bool): Whether to skip waiting for the element.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             Any: The result of the JavaScript execution, or None if execution fails.
@@ -423,11 +440,12 @@ class WebSession:
                 return result
             return None
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return None
 
-    def get_page_title(self) -> Optional[str]:
+    def get_page_title(self, suppress_traceback: bool = False) -> Optional[str]:
         """
         Get the title of the page.
         
@@ -437,11 +455,12 @@ class WebSession:
         try:
             return self.driver.title
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return None
 
-    def get_page_source(self) -> Optional[str]:
+    def get_page_source(self, suppress_traceback: bool = False) -> Optional[str]:
         """
         Get the source code of the page.
         
@@ -451,11 +470,12 @@ class WebSession:
         try:
             return self.driver.page_source
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return None
 
-    def get_current_url(self) -> Optional[str]:
+    def get_current_url(self, suppress_traceback: bool = False) -> Optional[str]:
         """
         Get the current URL of the page.
         
@@ -465,11 +485,12 @@ class WebSession:
         try:
             return self.driver.current_url
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return None
 
-    def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10) -> bool:
+    def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10, suppress_traceback: bool = False) -> bool:
         """
         Scroll the page or an element.
         
@@ -482,6 +503,7 @@ class WebSession:
             y (int): The y-coordinate to scroll to.
             to_end (bool): If True, scrolls to the bottom of the element or the entire page. If False, scrolls to the top.
             timeout (int): The maximum time to wait for the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         
         Returns:
             bool: True if the scroll is successful, False otherwise.
@@ -521,49 +543,64 @@ class WebSession:
                 raise ValueError("Invalid scroll parameters")
             return True
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
             return False
 
-    def go_to(self, url: str) -> None:
+    def go_to(self, url: str, suppress_traceback: bool = False) -> None:
         """
         Navigate to a URL.
         
         Args:
             url (str): The URL to navigate to.
+            suppress_traceback (bool): Whether to suppress the traceback print.
         """
         try:
             self.driver.get(url)
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
 
-    def refresh(self) -> None:
+    def refresh(self, suppress_traceback: bool = False) -> None:
         """
         Refresh the current page.
+        
+        Args:
+            suppress_traceback (bool): Whether to suppress the traceback print.
         """
         try:
             self.driver.refresh()
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
 
-    def back(self) -> None:
+    def back(self, suppress_traceback: bool = False) -> None:
         """
         Navigate back in the browser history.
+        
+        Args:
+            suppress_traceback (bool): Whether to suppress the traceback print.
         """
         try:
             self.driver.back()
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
 
-    def forward(self) -> None:
+    def forward(self, suppress_traceback: bool = False) -> None:
         """
         Navigate forward in the browser history.
+        
+        Args:
+            suppress_traceback (bool): Whether to suppress the traceback print.
         """
         try:
             self.driver.forward()
         except Exception:
-            error_traceback = clean_traceback(traceback.format_exc())
-            print(error_traceback)
+            if not suppress_traceback:
+                error_traceback = clean_traceback(traceback.format_exc())
+                print(error_traceback)
