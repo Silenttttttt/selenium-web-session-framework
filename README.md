@@ -1,71 +1,154 @@
-# Selenium Web Session Framework
+# Web Automation Framework
 
-A Python framework for web automation using Selenium, providing easy-to-use methods for common web interactions with support for explicit waits and organized selectors.
+This framework provides a set of tools for automating web interactions using Selenium. It includes methods for navigating to URLs, interacting with web elements, extracting data, and performing various actions such as clicking, typing, and scrolling.
 
-## Features
+## Getting Started
 
-- Easy-to-use methods for common web interactions (click, type, clear, hover, etc.)
-- Support for explicit waits to ensure elements are present before interacting
-- Organized selectors using a dictionary for cleaner and more maintainable scripts
-- Ability to skip waits and specify timeouts for element interactions
-- Methods to retrieve session information (current URL, page title, page source)
+### Installation
 
-## Installation
+1. **Install Selenium**: Make sure you have Selenium installed. You can install it using pip:
+   ```
+   pip install selenium
+   ```
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/Silenttttttt/selenium-web-session-framework.git
-    ```
+2. **WebDriver**: Download the appropriate WebDriver for your browser (e.g., ChromeDriver for Chrome) and ensure it's in your system's PATH.
 
-2. Install the required dependencies:
-    ```sh
-    pip install selenium
-    ```
+### Initialization
 
-## Usage
+To start using the framework, you need to initialize a `WebSession` object. You can choose to run the browser in headless mode or not.
 
-### Define Selectors
+### Example:
+```python
+session = WebSession(headless=False)
+```
 
-Define your selectors in a dictionary at the top of your script.
+## Methods Overview
 
-### Perform Actions
+### Navigation
 
-Use the framework to perform actions on the web page.
+- **go_to(url: str) -> bool**: Navigate to a specified URL.
+  - `url`: The URL to navigate to.
+  - Returns `True` if navigation is successful.
 
-### Example Script
+### Waiting for Elements
 
-The `script_tests.py` file contains a few examples of how to use the framework. Below is a brief overview of what the script does:
+- **wait_for_element(selector_type: SelectorType, selector: str, timeout: int = 10) -> Optional[WebElement]**: Wait for an element to be present in the DOM.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns the found element, or `None` if not found.
 
-- Navigates to YouTube
-- Clears the search box
-- Types a search query into the search box
-- Clicks the search button
-- Waits for search results to load and clicks the first video thumbnail
-- Extracts the video title
-- Hovers over the video title
-- Retrieves session information (current URL, page title, page source)
-- Runs a JavaScript command to scroll down
+- **wait_for_elements(selector_type: SelectorType, selector: str, timeout: int = 10) -> List[WebElement]**: Wait for multiple elements to be present in the DOM.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `timeout`: The maximum time to wait for the elements.
+  - Returns a list of found elements, or an empty list if none are found.
 
-For detailed examples, please refer to the `script_tests.py` file in the repository.
+### Finding Elements
 
-### Explanation of Methods
+- **find_element(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> Optional[WebElement]**: Find a single element in the DOM.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns the found element, or `None` if not found.
 
-- `go_to(url)`: Navigate to the specified URL.
-- `clear(selector_type, selector, skip_wait=False, timeout=10)`: Clear the text in the specified element.
-- `type_text(selector_type, selector, text, skip_wait=False, timeout=10)`: Type the specified text into the specified element.
-- `click(selector_type, selector, skip_wait=False, timeout=10)`: Click the specified element.
-- `hover(selector_type, selector, skip_wait=False, timeout=10)`: Hover over the specified element.
-- `extract(selector_type, selector, attribute=None, skip_wait=False, timeout=10)`: Extract the specified attribute (or text) from the specified element.
-- `run_js(selector_type, selector, script, skip_wait=False, timeout=10)`: Run the specified JavaScript code on the specified element.
-- `get_current_url()`: Get the current URL of the browser.
-- `get_page_title()`: Get the title of the current page.
-- `get_page_source()`: Get the source code of the current page.
-- `close()`: Close the browser session.
+- **find_elements(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> List[WebElement]**: Find multiple elements in the DOM.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the elements.
+  - `timeout`: The maximum time to wait for the elements.
+  - Returns a list of found elements, or an empty list if none are found.
 
-## Contributing
+### Interacting with Elements
 
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+- **click(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool**: Click an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns `True` if the click is successful, `False` otherwise.
 
-## License
+- **right_click(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool**: Right-click an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns `True` if the right-click is successful, `False` otherwise.
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+- **type_text(selector_type: SelectorType, selector: str, text: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool**: Type text into an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `text`: The text to type.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - `interactable_timeout`: The maximum time to wait for the element to be interactable.
+  - Returns `True` if the text is successfully typed, `False` otherwise.
+
+- **clear(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool**: Clear the text in an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - `interactable_timeout`: The maximum time to wait for the element to be interactable.
+  - Returns `True` if the element is successfully cleared, `False` otherwise.
+
+- **hover(selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool**: Hover over an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns `True` if the hover is successful, `False` otherwise.
+
+### Extracting Data
+
+- **extract(selector_type: SelectorType, selector: str, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10) -> Optional[str]**: Extract data from an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `attribute`: The attribute to extract. Use `"__text__"` to extract the text content.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns the extracted data, or `None` if extraction fails.
+
+### Running JavaScript
+
+- **run_js(selector_type: SelectorType, selector: str, script: str, skip_wait: bool = False, timeout: int = 10) -> Optional[Any]**: Run JavaScript on an element.
+  - `selector_type`: The type of selector (XPATH or CSS).
+  - `selector`: The selector string.
+  - `script`: The JavaScript code to run.
+  - `skip_wait`: Whether to skip waiting for the element.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns the result of the JavaScript execution, or `None` if execution fails.
+
+### Getting Page Information
+
+- **get_page_title() -> Optional[str]**: Get the title of the page.
+  - Returns the page title, or `None` if retrieval fails.
+
+- **get_page_source() -> Optional[str]**: Get the source code of the page.
+  - Returns the page source, or `None` if retrieval fails.
+
+- **get_current_url() -> Optional[str]**: Get the current URL of the page.
+  - Returns the current URL, or `None` if retrieval fails.
+
+### Closing the Session
+
+- **close() -> bool**: Close the browser session.
+  - Returns `True` if the session is successfully closed.
+
+### Scrolling
+
+- **scroll(direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10) -> bool**: Scroll the page or an element.
+  - `direction`: The direction to scroll ("down", "up", "to_element").
+  - `amount`: The amount to scroll (used for "down" and "up" directions).
+  - `selector_type`: The type of selector (XPATH or CSS) for the element to scroll to.
+  - `selector`: The selector string for the element to scroll to.
+  - `x`: The x-coordinate to scroll to.
+  - `y`: The y-coordinate to scroll to.
+  - `to_end`: If `True`, scrolls to the bottom of the element or the entire page. If `False`, scrolls to the top.
+  - `timeout`: The maximum time to wait for the element.
+  - Returns `True` if the scroll is successful, `False` otherwise.
+
+## Examples
+
+Refer to the `script_tests.py` file for example usage of the framework. The file contains various examples demonstrating how to use the methods provided by the `WebSession` class
