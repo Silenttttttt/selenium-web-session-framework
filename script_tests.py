@@ -166,22 +166,31 @@ def main():
     session = WebSession(headless=False)
     # Perform navigation example
     example_navigation(session)
+    time.sleep(5)
     # Perform search example
     example_search(session)
+    time.sleep(5)
     # Perform click and extract example
     example_click_and_extract(session)
+    time.sleep(5)
     # Perform hover example
     example_hover(session)
+    time.sleep(5)
     # Perform JavaScript execution example
     example_run_js(session)
+    time.sleep(5)
     # Perform scroll to element example
     example_scroll_to_element(session)
+    time.sleep(5)
     # Perform scroll to coordinates example
     example_scroll_to_coords(session)
+    time.sleep(5)
     # Perform scroll to bottom of page example
     example_scroll_to_bottom_of_page(session)
+    time.sleep(5)
     # Perform direct WebDriver access example
     example_direct_driver_access(session)
+    time.sleep(5)
     # Perform find multiple elements example
     example_find_multiple_elements(session)
     # Wait for 10 seconds to observe the actions

@@ -4,8 +4,10 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import ElementClickInterceptedException
+from selenium.webdriver.remote.webelement import WebElement
 from enum import Enum
 import traceback
+from typing import List, Optional, Any
 
 class SelectorType(Enum):
     """Enum for selector types."""
@@ -13,7 +15,7 @@ class SelectorType(Enum):
     CSS = 'css'
 
 class WebSession:
-    def __init__(self, headless=False):
+    def __init__(self, headless: bool = False) -> None:
         """
         Initialize the WebSession.
         
@@ -24,7 +26,7 @@ class WebSession:
         options.headless = headless
         self.driver = webdriver.Chrome(options=options)
 
-    def go_to(self, url):
+    def go_to(self, url: str) -> bool:
         """
         Navigate to a URL.
         
@@ -37,7 +39,7 @@ class WebSession:
         self.driver.get(url)
         return True
 
-    def wait_for_element(self, selector_type, selector, timeout=10):
+    def wait_for_element(self, selector_type: SelectorType, selector: str, timeout: int = 10) -> Optional[WebElement]:
         """
         Wait for an element to be present in the DOM.
         
@@ -61,7 +63,7 @@ class WebSession:
             traceback.print_exc()
             return None
 
-    def wait_for_elements(self, selector_type, selector, timeout=10):
+    def wait_for_elements(self, selector_type: SelectorType, selector: str, timeout: int = 10) -> List[WebElement]:
         """
         Wait for multiple elements to be present in the DOM.
         
@@ -85,7 +87,7 @@ class WebSession:
             traceback.print_exc()
             return []
 
-    def find_element(self, selector_type, selector, skip_wait=False, timeout=10):
+    def find_element(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> Optional[WebElement]:
         """
         Find a single element in the DOM.
         
@@ -108,7 +110,7 @@ class WebSession:
         else:
             return self.wait_for_element(selector_type, selector, timeout)
 
-    def find_elements(self, selector_type, selector, skip_wait=False, timeout=10):
+    def find_elements(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> List[WebElement]:
         """
         Find multiple elements in the DOM.
         
@@ -131,7 +133,7 @@ class WebSession:
         else:
             return self.wait_for_elements(selector_type, selector, timeout)
 
-    def click(self, selector_type, selector, skip_wait=False, timeout=10):
+    def click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
         """
         Click an element.
         
@@ -154,7 +156,7 @@ class WebSession:
             traceback.print_exc()
             return False
 
-    def safe_click(self, element, timeout=10):
+    def safe_click(self, element: WebElement) -> bool:
         """
         Safely click an element, handling potential interceptors.
         
@@ -192,7 +194,7 @@ class WebSession:
                     traceback.print_exc()
             return False
 
-    def right_click(self, selector_type, selector, skip_wait=False, timeout=10):
+    def right_click(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
         """
         Right-click an element.
         
@@ -217,7 +219,7 @@ class WebSession:
             traceback.print_exc()
             return False
 
-    def type_text(self, selector_type, selector, text, skip_wait=False, timeout=10, interactable_timeout=10):
+    def type_text(self, selector_type: SelectorType, selector: str, text: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool:
         """
         Type text into an element.
         
@@ -245,7 +247,7 @@ class WebSession:
             traceback.print_exc()
             return False
 
-    def clear(self, selector_type, selector, skip_wait=False, timeout=10, interactable_timeout=10):
+    def clear(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10, interactable_timeout: int = 10) -> bool:
         """
         Clear the text in an element.
         
@@ -272,7 +274,7 @@ class WebSession:
             traceback.print_exc()
             return False
 
-    def hover(self, selector_type, selector, skip_wait=False, timeout=10):
+    def hover(self, selector_type: SelectorType, selector: str, skip_wait: bool = False, timeout: int = 10) -> bool:
         """
         Hover over an element.
         
@@ -297,7 +299,7 @@ class WebSession:
             traceback.print_exc()
             return False
 
-    def extract(self, selector_type, selector, attribute=None, skip_wait=False, timeout=10):
+    def extract(self, selector_type: SelectorType, selector: str, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10) -> Optional[str]:
         """
         Extract data from an element.
         
@@ -326,7 +328,7 @@ class WebSession:
             traceback.print_exc()
             return None
 
-    def run_js(self, selector_type, selector, script, skip_wait=False, timeout=10):
+    def run_js(self, selector_type: SelectorType, selector: str, script: str, skip_wait: bool = False, timeout: int = 10) -> Optional[Any]:
         """
         Run JavaScript on an element.
         
@@ -352,21 +354,7 @@ class WebSession:
             traceback.print_exc()
             return None
 
-    def get_current_url(self):
-        """
-        Get the current URL of the page.
-        
-        Returns:
-            str: The current URL, or None if retrieval fails.
-        """
-        try:
-            return self.driver.current_url
-        except Exception as e:
-            print(f"Error getting current URL: {e}")
-            traceback.print_exc()
-            return None
-
-    def get_page_title(self):
+    def get_page_title(self) -> Optional[str]:
         """
         Get the title of the page.
         
@@ -380,7 +368,7 @@ class WebSession:
             traceback.print_exc()
             return None
 
-    def get_page_source(self):
+    def get_page_source(self) -> Optional[str]:
         """
         Get the source code of the page.
         
@@ -394,7 +382,21 @@ class WebSession:
             traceback.print_exc()
             return None
 
-    def close(self):
+    def get_current_url(self) -> Optional[str]:
+        """
+        Get the current URL of the page.
+        
+        Returns:
+            str: The current URL, or None if retrieval fails.
+        """
+        try:
+            return self.driver.current_url
+        except Exception as e:
+            print(f"Error getting current URL: {e}")
+            traceback.print_exc()
+            return None
+
+    def close(self) -> bool:
         """
         Close the browser session.
         
@@ -404,7 +406,7 @@ class WebSession:
         self.driver.quit()
         return True
 
-    def scroll(self, direction="down", amount=None, selector_type=None, selector=None, x=None, y=None, to_end=False, timeout=10):
+    def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10) -> bool:
         """
         Scroll the page or an element.
         
