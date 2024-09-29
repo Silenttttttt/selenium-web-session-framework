@@ -19,10 +19,20 @@ To start using the framework, you need to initialize a `WebSession` object. You 
 
 ### Example:
 ```python
+# Import the WebSession class
+from web_actions import WebSession
+
+# Initialize the WebSession object
 session = WebSession(headless=False)
+
+# Navigate to Google
 session.go_to("https://www.google.com")
+
+# Get the page title
 page_title = session.get_page_title()
 print(page_title)
+
+# Close the browser session
 session.close()
 ```
 
