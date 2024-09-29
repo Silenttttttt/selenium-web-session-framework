@@ -164,7 +164,11 @@ def example_scroll_to_bottom_of_page(session):
 def main():
     # Define options for the browser
     options = {
-        "headless": False
+        "headless": False,
+        "incognito": True,
+        "disable-gpu": False,
+        "window-size": "1920,1080",
+       # "user-data-dir": "/path/to/your/user/data"
     }
 
     # Initialize the web session
