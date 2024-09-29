@@ -32,9 +32,35 @@ Define your selectors in a dictionary at the top of your script.
 
 Use the framework to perform actions on the web page.
 
-### Framework Code
+### Example Script
 
-The framework provides a `WebSession` class with methods for common web interactions.
+The `script_tests.py` file contains a few examples of how to use the framework. Below is a brief overview of what the script does:
+
+- Navigates to YouTube
+- Clears the search box
+- Types a search query into the search box
+- Clicks the search button
+- Waits for search results to load and clicks the first video thumbnail
+- Extracts the video title
+- Hovers over the video title
+- Retrieves session information (current URL, page title, page source)
+- Runs a JavaScript command to scroll down
+
+For detailed examples, please refer to the `script_tests.py` file in the repository.
+
+### Explanation of Methods
+
+- `go_to(url)`: Navigate to the specified URL.
+- `clear(selector_type, selector, skip_wait=False, timeout=10)`: Clear the text in the specified element.
+- `type_text(selector_type, selector, text, skip_wait=False, timeout=10)`: Type the specified text into the specified element.
+- `click(selector_type, selector, skip_wait=False, timeout=10)`: Click the specified element.
+- `hover(selector_type, selector, skip_wait=False, timeout=10)`: Hover over the specified element.
+- `extract(selector_type, selector, attribute=None, skip_wait=False, timeout=10)`: Extract the specified attribute (or text) from the specified element.
+- `run_js(selector_type, selector, script, skip_wait=False, timeout=10)`: Run the specified JavaScript code on the specified element.
+- `get_current_url()`: Get the current URL of the browser.
+- `get_page_title()`: Get the title of the current page.
+- `get_page_source()`: Get the source code of the current page.
+- `close()`: Close the browser session.
 
 ## Contributing
 
