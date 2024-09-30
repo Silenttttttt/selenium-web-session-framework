@@ -26,7 +26,7 @@ selectors = {
     "repo_language": 'd-inline-block mr-3',
     "repo_stars": 'pinned-item-meta Link--muted',
     "repo_forks": '//a[contains(@href,"/fork")]',
-    "repo_container": "mb-3 d-flex flex-content-stretch sortable-button-item pinned-item-list-item js-pinned-item-list-item col-12 col-md-6 col-lg-6"
+    "repo_container": "mb-3 d-flex flex-content-stretch col-12 col-md-6 col-lg-6"
 }
 
 
@@ -34,6 +34,7 @@ selectors = {
 # Navigate to the GitHub profile
 profile_url = "https://github.com/Silenttttttt"
 session.go_to(profile_url)
+
 #time.sleep(3)
 
 repo_description_selector = session.class_to_css_selector(selectors["repo_description"])
@@ -42,13 +43,14 @@ repo_language_selector = session.class_to_css_selector(selectors["repo_language"
 repo_stars_selector = session.class_to_css_selector(selectors["repo_stars"])
 repo_elements = session.find_elements(SelectorType.CSS, repo_selector)
 
+
 # Wait for the profile name element to be present
 name = session.extract(selector_type=SelectorType.XPATH, selector=selectors["name"], timeout=5)
 username = session.extract(selector_type=SelectorType.XPATH, selector=selectors["username"], timeout=5)
-bio = session.extract(selector_type=SelectorType.XPATH, selector=selectors["bio"], timeout=5)
-
-
-
+try:
+    bio = session.extract(selector_type=SelectorType.XPATH, selector=selectors["bio"], timeout=5, raise_exc=True)
+except Exception:
+    bio = ""
 
 # Extract and organize the repository information
 repositories = []
@@ -57,6 +59,8 @@ for element in repo_elements:
     repo_description = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_description_selector, skip_wait=True)
     repo_language = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_language_selector, skip_wait=True)
     repo_stars = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_stars_selector, skip_wait=True)
+  #  fork_element = session.find_element(SelectorType.XPATH, selectors["repo_forks"])
+ #   session.modify_element(fork_element, text="69")
     repo_forks = session.extract(element=element, selector_type=SelectorType.XPATH, selector=selectors["repo_forks"], skip_wait=True)
     
     repository = {
