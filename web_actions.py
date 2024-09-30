@@ -108,7 +108,7 @@ class WebSession:
         print("Debug mode: Browser is open and waiting indefinitely.")
         try:
             while True:
-                pass
+                time.sleep(1)
         except KeyboardInterrupt:
             print("Debug mode: Exiting on keyboard interrupt.")
         finally:
@@ -1285,3 +1285,35 @@ class WebSession:
         escaped_selector = ''.join(escaped_segments)
         return escaped_selector
     
+    def modify_element(self, element: WebElement, attributes: Optional[Dict[str, str]] = None, text: Optional[str] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+        """
+        Modify the attributes and text of an element.
+        
+        Args:
+            element (WebElement): The element to modify.
+            attributes (dict): A dictionary of attributes to set on the element.
+            text (str): The text content to set on the element.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            bool: True if the modification is successful, False otherwise.
+        """
+        try:
+            # Modify attributes
+            if attributes:
+                for attr, value in attributes.items():
+                    self.driver.execute_script(f"arguments[0].setAttribute(arguments[1], arguments[2]);", element, attr, value)
+            
+            # Modify text content
+            if text is not None:
+                self.driver.execute_script("arguments[0].textContent = arguments[1];", element, text)
+            
+            return True
+        except Exception:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            return False
