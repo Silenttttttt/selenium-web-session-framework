@@ -562,17 +562,12 @@ class WebSession:
             if element:
                 # If both element and selector/selector_type are provided, find the sub-element within the element
                 if selector_type and selector:
-                    if selector_type == SelectorType.XPATH:
-                        sub_element = element.find_element(By.XPATH, selector)
-                    elif selector_type == SelectorType.CSS:
-                        sub_element = element.find_element(By.CSS_SELECTOR, selector)
-                    else:
-                        raise ValueError(f"Unsupported selector type: {selector_type}")
+                    sub_element = self.find_element(selector_type, selector, element, suppress_traceback, raise_exc)
                 else:
                     sub_element = element
             else:
                 # If only selector/selector_type are provided, find the element
-                sub_element = self.find_element(selector_type, selector, skip_wait, timeout, suppress_traceback, raise_exc)
+                sub_element = self.find_element(selector_type, selector, suppress_traceback=suppress_traceback, raise_exc=raise_exc)
             
             if sub_element:
                 if attribute == "__text__":
