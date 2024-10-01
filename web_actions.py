@@ -19,6 +19,13 @@ except ImportError:
     tqdm_installed = False
 
 
+try:
+    import undetected_chromedriver as uc
+    uc_installed = True
+except ImportError:
+    uc_installed = False
+
+
 
 class SelectorType(Enum):
     XPATH = "xpath"
@@ -72,12 +79,13 @@ def format_deeper_traceback() -> str:
     return "\n".join(combined_traceback)
 
 class WebSession:
-    def __init__(self, options: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(self, options: Optional[Dict[str, Any]] = None, use_undetected: bool = False) -> None:
         """
         Initialize the WebSession.
         
         Args:
             options (dict): A dictionary of options to configure the browser.
+            use_undetected (bool): Whether to use undetected ChromeDriver.
         """
         chrome_options = webdriver.ChromeOptions()
         if options:
@@ -87,7 +95,12 @@ class WebSession:
                 elif isinstance(value, str):
                     chrome_options.add_argument(f"--{key}={value}")
                 # Add more specific handling as needed
-        self.driver = webdriver.Chrome(options=chrome_options)
+
+        if use_undetected and uc_installed:
+            self.driver = uc.Chrome(options=chrome_options)
+        else:
+            self.driver = webdriver.Chrome(options=chrome_options)
+        
         atexit.register(self.close)
 
     def close(self) -> bool:
@@ -235,7 +248,7 @@ class WebSession:
             return None
 
 
-    def find_elements(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> List[WebElement]:
+    def find_elements(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False, timeout: int = 10, use_timeout: bool = False) -> List[WebElement]:
         """
         Find elements using various selector types.
         
@@ -245,49 +258,93 @@ class WebSession:
             element (WebElement): The WebElement object to search within.
             suppress_traceback (bool): Whether to suppress the traceback print.
             raise_exc (bool): Whether to re-raise the exception.
+            timeout (int): The maximum time to wait for the elements.
+            use_timeout (bool): Whether to use the timeout for waiting for elements.
         
         Returns:
             list: A list of found elements, or an empty list if none are found.
         """
         try:
             if element:
-                if selector_type == SelectorType.XPATH:
-                    return element.find_elements(By.XPATH, selector)
-                elif selector_type == SelectorType.CSS:
-                    return element.find_elements(By.CSS_SELECTOR, selector)
-                elif selector_type == SelectorType.ID:
-                    return element.find_elements(By.ID, selector)
-                elif selector_type == SelectorType.NAME:
-                    return element.find_elements(By.NAME, selector)
-                elif selector_type == SelectorType.CLASS_NAME:
-                    return element.find_elements(By.CLASS_NAME, selector)
-                elif selector_type == SelectorType.TAG_NAME:
-                    return element.find_elements(By.TAG_NAME, selector)
-                elif selector_type == SelectorType.LINK_TEXT:
-                    return element.find_elements(By.LINK_TEXT, selector)
-                elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
-                    return element.find_elements(By.PARTIAL_LINK_TEXT, selector)
+                if use_timeout:
+                    wait = WebDriverWait(element, timeout)
+                    if selector_type == SelectorType.XPATH:
+                        return wait.until(EC.presence_of_all_elements_located((By.XPATH, selector)))
+                    elif selector_type == SelectorType.CSS:
+                        return wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))
+                    elif selector_type == SelectorType.ID:
+                        return wait.until(EC.presence_of_all_elements_located((By.ID, selector)))
+                    elif selector_type == SelectorType.NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.NAME, selector)))
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, selector)))
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, selector)))
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return wait.until(EC.presence_of_all_elements_located((By.LINK_TEXT, selector)))
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return wait.until(EC.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, selector)))
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
                 else:
-                    raise ValueError(f"Unsupported selector type: {selector_type}")
+                    if selector_type == SelectorType.XPATH:
+                        return element.find_elements(By.XPATH, selector)
+                    elif selector_type == SelectorType.CSS:
+                        return element.find_elements(By.CSS_SELECTOR, selector)
+                    elif selector_type == SelectorType.ID:
+                        return element.find_elements(By.ID, selector)
+                    elif selector_type == SelectorType.NAME:
+                        return element.find_elements(By.NAME, selector)
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return element.find_elements(By.CLASS_NAME, selector)
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return element.find_elements(By.TAG_NAME, selector)
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return element.find_elements(By.LINK_TEXT, selector)
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return element.find_elements(By.PARTIAL_LINK_TEXT, selector)
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
             else:
-                if selector_type == SelectorType.XPATH:
-                    return self.driver.find_elements(By.XPATH, selector)
-                elif selector_type == SelectorType.CSS:
-                    return self.driver.find_elements(By.CSS_SELECTOR, selector)
-                elif selector_type == SelectorType.ID:
-                    return self.driver.find_elements(By.ID, selector)
-                elif selector_type == SelectorType.NAME:
-                    return self.driver.find_elements(By.NAME, selector)
-                elif selector_type == SelectorType.CLASS_NAME:
-                    return self.driver.find_elements(By.CLASS_NAME, selector)
-                elif selector_type == SelectorType.TAG_NAME:
-                    return self.driver.find_elements(By.TAG_NAME, selector)
-                elif selector_type == SelectorType.LINK_TEXT:
-                    return self.driver.find_elements(By.LINK_TEXT, selector)
-                elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
-                    return self.driver.find_elements(By.PARTIAL_LINK_TEXT, selector)
+                if use_timeout:
+                    wait = WebDriverWait(self.driver, timeout)
+                    if selector_type == SelectorType.XPATH:
+                        return wait.until(EC.presence_of_all_elements_located((By.XPATH, selector)))
+                    elif selector_type == SelectorType.CSS:
+                        return wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))
+                    elif selector_type == SelectorType.ID:
+                        return wait.until(EC.presence_of_all_elements_located((By.ID, selector)))
+                    elif selector_type == SelectorType.NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.NAME, selector)))
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, selector)))
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, selector)))
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return wait.until(EC.presence_of_all_elements_located((By.LINK_TEXT, selector)))
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return wait.until(EC.presence_of_all_elements_located((By.PARTIAL_LINK_TEXT, selector)))
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
                 else:
-                    raise ValueError(f"Unsupported selector type: {selector_type}")
+                    if selector_type == SelectorType.XPATH:
+                        return self.driver.find_elements(By.XPATH, selector)
+                    elif selector_type == SelectorType.CSS:
+                        return self.driver.find_elements(By.CSS_SELECTOR, selector)
+                    elif selector_type == SelectorType.ID:
+                        return self.driver.find_elements(By.ID, selector)
+                    elif selector_type == SelectorType.NAME:
+                        return self.driver.find_elements(By.NAME, selector)
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return self.driver.find_elements(By.CLASS_NAME, selector)
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return self.driver.find_elements(By.TAG_NAME, selector)
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return self.driver.find_elements(By.LINK_TEXT, selector)
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return self.driver.find_elements(By.PARTIAL_LINK_TEXT, selector)
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
         except Exception:
             if raise_exc:
                 raise
@@ -297,14 +354,16 @@ class WebSession:
             return []
 
 
-    def find_similar_elements(self, element: Optional[WebElement] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, suppress_traceback: bool = False, reraise_exception: bool = False) -> List[WebElement]:
+    def find_similar_elements(self, element: WebElement, similarity_criteria: str = "class", match_all_classes: bool = False, partial_match: bool = False, custom_xpath: Optional[str] = None, suppress_traceback: bool = False, reraise_exception: bool = False) -> List[WebElement]:
         """
-        Find similar elements in the DOM based on a given element or selector.
+        Find similar elements in the DOM based on a given element and similarity criteria.
         
         Args:
             element (WebElement): The reference element to find similar elements.
-            selector_type (SelectorType): The type of selector (XPATH or CSS).
-            selector (str): The selector string.
+            similarity_criteria (str): The criteria for similarity ("tag", "class", "css_selector", "attribute"). Default is "class".
+            match_all_classes (bool): Whether to match all classes if similarity_criteria is "class".
+            partial_match (bool): Whether to allow partial matching for attributes.
+            custom_xpath (str): Custom XPath to use for finding similar elements.
             suppress_traceback (bool): Whether to suppress the traceback print.
             reraise_exception (bool): Whether to re-raise the exception.
         
@@ -312,31 +371,53 @@ class WebSession:
             list: A list of similar elements, or an empty list if none are found.
         """
         try:
-            if element:
-                # Find the parent container that holds all similar elements
-                parent = element.find_element(By.XPATH, "..")
-                # Use a specific XPath to find all child elements within that container
+            if not element:
+                raise ValueError("Element must be provided.")
+            
+            # Find the parent container that holds all similar elements
+            parent = element.find_element(By.XPATH, "..")
+            
+            if custom_xpath:
+                similar_elements = parent.find_elements(By.XPATH, custom_xpath)
+            elif similarity_criteria == "tag":
                 similar_elements = parent.find_elements(By.XPATH, f".//{element.tag_name}")
-            elif selector_type and selector:
-                # Find the reference element using the selector
-                reference_element = self.find_element(selector_type, selector)
-                if reference_element:
-                    # Find the parent container that holds all similar elements
-                    parent = reference_element.find_element(By.XPATH, "..")
-                    # Use a specific XPath to find all child elements within that container
-                    similar_elements = parent.find_elements(By.XPATH, f".//{reference_element.tag_name}")
+            elif similarity_criteria == "class":
+                class_names = element.get_attribute("class").split()
+                if not class_names:
+                    return []
+                if match_all_classes:
+                    class_condition = " and ".join([f"contains(@class, '{cls}')" for cls in class_names])
                 else:
-                    similar_elements = []
+                    class_condition = " or ".join([f"contains(@class, '{cls}')" for cls in class_names])
+                similar_elements = parent.find_elements(By.XPATH, f".//*[{class_condition}]")
+            elif similarity_criteria == "css_selector":
+                css_selector = self.get_css_selector(element)
+                similar_elements = parent.find_elements(By.CSS_SELECTOR, css_selector)
+            elif similarity_criteria.startswith("attribute:"):
+                attribute_name = similarity_criteria.split(":", 1)[1]
+                attribute_value = element.get_attribute(attribute_name)
+                if not attribute_value:
+                    return []
+                if partial_match:
+                    similar_elements = parent.find_elements(By.XPATH, f".//*[contains(@{attribute_name}, '{attribute_value}')]")
+                else:
+                    similar_elements = parent.find_elements(By.XPATH, f".//*[@{attribute_name}='{attribute_value}']")
             else:
-                raise ValueError("Either element or selector_type and selector must be provided.")
+                raise ValueError(f"Unsupported similarity criteria: {similarity_criteria}")
             
             # Filter out the reference element itself if it's included in the results
-            if element:
-                similar_elements = [el for el in similar_elements if el != element]
-            elif reference_element:
-                similar_elements = [el for el in similar_elements if el != reference_element]
+            similar_elements = [el for el in similar_elements if el != element]
             
-            return similar_elements
+            # Use a set to ensure no duplicates
+            unique_elements = []
+            seen = set()
+            for el in similar_elements:
+                el_id = el.get_attribute("id") or el.get_attribute("outerHTML")
+                if el_id not in seen:
+                    seen.add(el_id)
+                    unique_elements.append(el)
+            
+            return unique_elements
         except Exception:
             if reraise_exception:
                 raise
@@ -344,6 +425,7 @@ class WebSession:
                 error_traceback = format_deeper_traceback()
                 print(clean_traceback(error_traceback))
             return []
+
 
 
 
@@ -728,24 +810,35 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             return False
 
-    def go_to(self, url: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+    def go_to(self, url: str, suppress_traceback: bool = False, raise_exc: bool = False, return_status: bool = False) -> Optional[bool]:
         """
-        Navigate to a URL.
+        Navigate to a URL and optionally check if the page loaded successfully.
         
         Args:
             url (str): The URL to navigate to.
             suppress_traceback (bool): Whether to suppress the traceback print.
             raise_exc (bool): Whether to re-raise the exception.
+            return_status (bool): Whether to return the page load status using document.readyState.
+        
+        Returns:
+            bool: True if the page loaded successfully, False otherwise. Returns None if return_status is False.
         """
         try:
             self.driver.get(url)
+            if return_status:
+                # Check if the document is fully loaded
+                ready_state = self.driver.execute_script("return document.readyState")
+                return ready_state == "complete"
         except Exception:
             if raise_exc:
                 raise
             if not suppress_traceback:
                 error_traceback = format_deeper_traceback()
                 print(clean_traceback(error_traceback))
-
+            if return_status:
+                return False
+        return None
+    
     def refresh(self, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
         """
         Refresh the current page.
@@ -859,7 +952,6 @@ class WebSession:
 
 
 
-
     def generate_structure_html(self, elements: Union[WebElement, List[WebElement]], file_path: str = "structure_visualization.html", suppress_traceback: bool = False, raise_exc: bool = False) -> None:
         """
         Generate a dynamic HTML page to visualize the DOM structure starting from the given element or selector.
@@ -923,6 +1015,9 @@ class WebSession:
                 # Generate structure for the root element and its immediate children
                 _generate_structure(root_element, 0)
 
+                # Add the real DOM rendering for the root element
+                output.append(f"<div class='real-dom-container'>{root_element.get_attribute('outerHTML')}</div>")
+
                 # Update progress bar if tqdm is installed
                 if progress_bar:
                     progress_bar.update(1)
@@ -949,7 +1044,7 @@ class WebSession:
                     .hidden {{ display: none; }}
                     .highlight {{ background-color: yellow; }}
                     .code-container {{ border-bottom: 1px solid #ccc; padding-bottom: 10px; }}
-                    .real-dom-container {{ padding-top: 10px; }}
+                    .real-dom-container {{ padding: 20px; border: 1px solid #ccc; margin-top: 20px; }}
                     .selectors {{ position: absolute; right: 0; top: 0; }}
                     .selectors button {{ margin-left: 5px; }}
                     .children {{ margin-left: 20px; }}
@@ -1041,9 +1136,6 @@ class WebSession:
                     <input type="text" id="search-input" onkeyup="filterElements()" placeholder="Search for elements...">
                 </div>
                 <div class="code-container">{''.join(output)}</div>
-                <div class="real-dom-container">
-                    {''.join([root_element.get_attribute('outerHTML') for root_element in root_elements])}
-                </div>
             </body>
             </html>
             """
@@ -1316,4 +1408,156 @@ class WebSession:
             if not suppress_traceback:
                 error_traceback = format_deeper_traceback()
                 print(clean_traceback(error_traceback))
+            return False
+        
+
+    def get_page_content(self, file_name: Optional[str] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> Optional[str]:
+        """
+        Get the entire page content.
+        
+        Args:
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+            file_name (str): The file name to save the page content. If None, return the content as a string.
+        
+        Returns:
+            str: The page content as a string if file_name is None, otherwise None.
+        """
+        try:
+            page_content = self.driver.page_source
+            
+            if file_name:
+                with open(file_name, 'w', encoding='utf-8') as file:
+                    file.write(page_content)
+                return None
+            else:
+                return page_content
+        except Exception:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            return None
+        
+    def compare_elements(self, element1: WebElement, element2: WebElement, comparison_method: str = "tag", suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+        """
+        Compare two elements based on the specified comparison method.
+        
+        Args:
+            element1 (WebElement): The first element to compare.
+            element2 (WebElement): The second element to compare.
+            comparison_method (str): The method to use for comparison ("tag", "class", "css_selector", "attribute", "xpath", "text"). Default is "tag".
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            bool: True if the elements are considered similar based on the comparison method, False otherwise.
+        """
+        try:
+            if comparison_method == "tag":
+                return element1.tag_name == element2.tag_name
+            elif comparison_method == "class":
+                class1 = set(element1.get_attribute("class").split())
+                class2 = set(element2.get_attribute("class").split())
+                return class1 == class2
+            elif comparison_method == "css_selector":
+                css_selector1 = self.get_css_selector(element1)
+                css_selector2 = self.get_css_selector(element2)
+                return css_selector1 == css_selector2
+            elif comparison_method == "xpath":
+                xpath1 = self.get_xpath(element1)
+                xpath2 = self.get_xpath(element2)
+                return xpath1 == xpath2
+            elif comparison_method == "text":
+                return element1.text.strip() == element2.text.strip()
+            elif comparison_method.startswith("attribute:"):
+                attribute_name = comparison_method.split(":", 1)[1]
+                attribute_value1 = element1.get_attribute(attribute_name)
+                attribute_value2 = element2.get_attribute(attribute_name)
+                return attribute_value1 == attribute_value2
+            else:
+                raise ValueError(f"Unsupported comparison method: {comparison_method}")
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error comparing elements: {e}")
+            return False
+
+
+    def comprehensive_comparison(self, element1: WebElement, element2: WebElement, compare_css: bool = False, include_attributes: List[str] = None, exclude_attributes: List[str] = None, include_css_properties: List[str] = None, exclude_css_properties: List[str] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+        """
+        Perform a comprehensive comparison of two elements.
+        
+        Args:
+            element1 (WebElement): The first element to compare.
+            element2 (WebElement): The second element to compare.
+            compare_css (bool): Whether to compare CSS properties. Default is False.
+            include_attributes (List[str]): List of attributes to include in the comparison. If None, all attributes are included.
+            exclude_attributes (List[str]): List of attributes to exclude from the comparison.
+            include_css_properties (List[str]): List of CSS properties to include in the comparison. If None, all CSS properties are included.
+            exclude_css_properties (List[str]): List of CSS properties to exclude from the comparison.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            bool: True if the elements are considered similar based on comprehensive criteria, False otherwise.
+        """
+        try:
+            # Compare tag names
+            if element1.tag_name != element2.tag_name:
+                return False
+            
+            # Compare class names
+            class1 = set(element1.get_attribute("class").split())
+            class2 = set(element2.get_attribute("class").split())
+            if class1 != class2:
+                return False
+            
+            # Compare attributes
+            attributes1 = {attr["name"]: attr["value"] for attr in element1.get_property("attributes")}
+            attributes2 = {attr["name"]: attr["value"] for attr in element2.get_property("attributes")}
+            
+            if include_attributes:
+                attributes1 = {k: v for k, v in attributes1.items() if k in include_attributes}
+                attributes2 = {k: v for k, v in attributes2.items() if k in include_attributes}
+            
+            if exclude_attributes:
+                attributes1 = {k: v for k, v in attributes1.items() if k not in exclude_attributes}
+                attributes2 = {k: v for k, v in attributes2.items() if k not in exclude_attributes}
+            
+            if attributes1 != attributes2:
+                return False
+            
+            # Compare text content
+            if element1.text.strip() != element2.text.strip():
+                return False
+            
+            # Optionally, compare CSS properties
+            if compare_css:
+                css_properties1 = {prop: element1.value_of_css_property(prop) for prop in element1.value_of_css_property("")}
+                css_properties2 = {prop: element2.value_of_css_property(prop) for prop in element2.value_of_css_property("")}
+                
+                if include_css_properties:
+                    css_properties1 = {k: v for k, v in css_properties1.items() if k in include_css_properties}
+                    css_properties2 = {k: v for k, v in css_properties2.items() if k in include_css_properties}
+                
+                if exclude_css_properties:
+                    css_properties1 = {k: v for k, v in css_properties1.items() if k not in exclude_css_properties}
+                    css_properties2 = {k: v for k, v in css_properties2.items() if k not in exclude_css_properties}
+                
+                if css_properties1 != css_properties2:
+                    return False
+            
+            return True
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error in comprehensive comparison: {e}")
             return False
