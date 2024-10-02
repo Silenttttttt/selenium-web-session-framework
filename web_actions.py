@@ -1440,14 +1440,14 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             return None
         
-    def compare_elements(self, element1: WebElement, element2: WebElement, comparison_method: str = "tag", suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+    def compare_elements(self, element1: WebElement, element2: WebElement, comparison_method: str = "class", suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
         """
         Compare two elements based on the specified comparison method.
         
         Args:
             element1 (WebElement): The first element to compare.
             element2 (WebElement): The second element to compare.
-            comparison_method (str): The method to use for comparison ("tag", "class", "css_selector", "attribute", "xpath", "text"). Default is "tag".
+            comparison_method (str): The method to use for comparison ("tag", "class", "css_selector", "attribute", "xpath", "text"). Default is "class".
             suppress_traceback (bool): Whether to suppress the traceback print.
             raise_exc (bool): Whether to re-raise the exception.
         
@@ -1491,7 +1491,9 @@ class WebSession:
     def comprehensive_comparison(self, element1: WebElement, element2: WebElement, compare_css: bool = False, include_attributes: List[str] = None, exclude_attributes: List[str] = None, include_css_properties: List[str] = None, exclude_css_properties: List[str] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
         """
         Perform a comprehensive comparison of two elements.
-        
+        This method is a good balance between accuracy and speed.
+        It is recommended over "compare_elements" in most cases, unless when the goal is to target a specific method of comparison.
+
         Args:
             element1 (WebElement): The first element to compare.
             element2 (WebElement): The second element to compare.
@@ -1560,4 +1562,32 @@ class WebSession:
                 error_traceback = format_deeper_traceback()
                 print(clean_traceback(error_traceback))
             print(f"Error in comprehensive comparison: {e}")
+            return False
+
+    def is_element_visible(self, element: WebElement, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+        """
+        Check if an element exists in the DOM and is visible on the page.
+        
+        Args:
+            element (WebElement): The element to check.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            bool: True if the element exists and is visible, False otherwise.
+        """
+        try:
+            if not element:
+                return False
+            # Check if the element is in the DOM by trying to access its tag name
+            element.tag_name
+            # Check if the element is visible
+            return element.is_displayed()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error checking if element is present and visible: {e}")
             return False
