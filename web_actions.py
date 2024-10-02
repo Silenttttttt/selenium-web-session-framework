@@ -1591,3 +1591,5 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             print(f"Error checking if element is present and visible: {e}")
             return False
+        
+
