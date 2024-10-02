@@ -29,13 +29,14 @@ selectors = {
     "repo_stars": 'pinned-item-meta Link--muted',
     "repo_forks": '//a[contains(@href,"/fork")]',
     "repo_container": "mb-3 d-flex flex-content-stretch col-12 col-md-6 col-lg-6",
-    "repo_container2": '//*[@id="user-profile-frame"]/div/div[2]/div/ol/li[1]'
+    "repo_container2": '//*[@id="user-profile-frame"]/div/div[2]/div/ol/li[1]',
+    "repo_status": 'Label Label--attention v-align-middle mt-1 no-wrap v-align-baseline Label--inline',
+    "repo_status2": 'Label Label--secondary v-align-middle mt-1 no-wrap v-align-baseline Label--inline'
 }
 
 
-
 # Navigate to the GitHub profile
-profile_url = "https://github.com/nguyenvanhuan243"
+profile_url = "https://github.com/Silenttttttt"
 
 session.go_to(profile_url)
 # Extract the username from the profile URL
@@ -68,7 +69,9 @@ repo_selector = session.class_to_css_selector(selectors["repo_container"])
 repo_language_selector = session.class_to_css_selector(selectors["repo_language"])
 repo_stars_selector = session.class_to_css_selector(selectors["repo_stars"])
 
+repo_status_selector = session.class_to_css_selector(selectors["repo_status"])
 
+repo_status2_selector = session.class_to_css_selector(selectors["repo_status2"])
 
 try:
     repo_elements = session.find_elements(SelectorType.CSS, repo_selector, timeout=5, raise_exc=True)
@@ -112,17 +115,29 @@ for element in repo_elements:
         repo_language = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_language_selector, skip_wait=True, raise_exc=True)
     except Exception:
         repo_language = ""
-    repo_stars = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_stars_selector, skip_wait=True)
-   # fork_element = session.find_element(SelectorType.XPATH, selectors["repo_forks"])
-   #text = fork_element.text
-    repo_forks = session.extract(element=element, selector_type=SelectorType.XPATH, selector=selectors["repo_forks"], skip_wait=True)
-    
+    try:
+        repo_stars = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_stars_selector, skip_wait=True, raise_exc=True)
+    except Exception:
+        repo_stars = ""
+    try:
+        repo_forks = session.extract(element=element, selector_type=SelectorType.XPATH, selector=selectors["repo_forks"], skip_wait=True, raise_exc=True)
+    except Exception:
+        repo_forks = ""
+    try:
+        repo_status = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_status_selector, skip_wait=True, raise_exc=True)
+    except Exception:
+        try:
+            repo_status = session.extract(element=element, selector_type=SelectorType.CSS, selector=repo_status2_selector, skip_wait=True, raise_exc=True)
+        except Exception:
+            repo_status = ""
+
     repository = {
         "name": repo_name,
         "description": repo_description,
         "language": repo_language,
         "stars": repo_stars,
-        "forks": repo_forks
+        "forks": repo_forks,
+        "status": repo_status
     }
     repositories.append(repository)
 
