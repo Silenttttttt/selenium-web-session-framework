@@ -429,7 +429,7 @@ class WebSession:
 
 
 
-    def click(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+    def click(self, selector_type: SelectorType = None, selector: str = None, element: Optional[WebElement] = None, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
         """
         Click an element.
         
@@ -445,7 +445,8 @@ class WebSession:
             bool: True if the click is successful, False otherwise.
         """
         try:
-
+            if not element and not selector_type and not selector:
+                raise ValueError("Element, selector_type, or selector must be provided.")
             if not element:
                 element = self.find_element(selector_type, selector, skip_wait, timeout, suppress_traceback, raise_exc)
             if element:
