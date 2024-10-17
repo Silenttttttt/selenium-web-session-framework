@@ -1596,3 +1596,46 @@ class WebSession:
             return False
         
 
+
+    def set_download_path(self, path: str, disable_popup: bool = True, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+        """
+        Set the download path for the browser.
+        
+        Args:
+            path (str): The path to set as the download location.
+            disable_popup (bool): Whether to disable the download popup. Default is True.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception. 
+        
+        Returns:
+            bool: True if the download path is set successfully, False otherwise.
+        """
+        try:
+            # Use Chrome DevTools Protocol to set the download directory
+            self.driver.execute_cdp_cmd(
+                "Page.setDownloadBehavior", 
+                {
+                    "behavior": "allow",
+                    "downloadPath": path
+                }
+            )
+
+            # Optionally disable the download popup
+            if disable_popup:
+                self.driver.execute_cdp_cmd(
+                    "Browser.setDownloadBehavior",
+                    {
+                        "behavior": "allow",
+                        "downloadPath": path
+                    }
+                )
+
+            return True
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error setting download path: {e}")
+            return False
