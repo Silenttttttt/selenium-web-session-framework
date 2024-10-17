@@ -752,7 +752,7 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             return None
 
-    def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
+    def scroll(self, direction: str = "down", amount: Optional[int] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, element: Optional[WebElement] = None, x: Optional[int] = None, y: Optional[int] = None, to_end: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> bool:
         """
         Scroll the page or an element.
         
@@ -761,6 +761,7 @@ class WebSession:
             amount (int): The amount to scroll (used for "down" and "up" directions).
             selector_type (SelectorType): The type of selector (XPATH or CSS) for the element to scroll to.
             selector (str): The selector string for the element to scroll to.
+            element (WebElement): The WebElement object to scroll.
             x (int): The x-coordinate to scroll to.
             y (int): The y-coordinate to scroll to.
             to_end (bool): If True, scrolls to the bottom of the element or the entire page. If False, scrolls to the top.
@@ -777,6 +778,11 @@ class WebSession:
             elif direction == "down":
                 if amount:
                     self.driver.execute_script(f"window.scrollBy(0, {amount});")
+                elif element:
+                    if to_end:
+                        self.driver.execute_script("arguments[0].scrollIntoView(false);", element)
+                    else:
+                        self.driver.execute_script("arguments[0].scrollIntoView();", element)
                 elif selector_type and selector:
                     element = self.find_element(selector_type, selector, timeout=timeout, suppress_traceback=suppress_traceback, raise_exc=raise_exc)
                     if element:
@@ -789,6 +795,11 @@ class WebSession:
             elif direction == "up":
                 if amount:
                     self.driver.execute_script(f"window.scrollBy(0, -{amount});")
+                elif element:
+                    if to_end:
+                        self.driver.execute_script("arguments[0].scrollIntoView(true);", element)
+                    else:
+                        self.driver.execute_script("arguments[0].scrollIntoView();", element)
                 elif selector_type and selector:
                     element = self.find_element(selector_type, selector, timeout=timeout, suppress_traceback=suppress_traceback, raise_exc=raise_exc)
                     if element:
@@ -798,10 +809,13 @@ class WebSession:
                             self.driver.execute_script("arguments[0].scrollIntoView();", element)
                 else:
                     self.driver.execute_script("window.scrollTo(0, 0);")
-            elif direction == "to_element" and selector_type and selector:
-                element = self.find_element(selector_type, selector, timeout=timeout, suppress_traceback=suppress_traceback, raise_exc=raise_exc)
+            elif direction == "to_element":
                 if element:
                     self.driver.execute_script("arguments[0].scrollIntoView();", element)
+                elif selector_type and selector:
+                    element = self.find_element(selector_type, selector, timeout=timeout, suppress_traceback=suppress_traceback, raise_exc=raise_exc)
+                    if element:
+                        self.driver.execute_script("arguments[0].scrollIntoView();", element)
             else:
                 raise ValueError("Invalid scroll parameters")
             return True
@@ -1639,3 +1653,117 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             print(f"Error setting download path: {e}")
             return False
+
+    def execute_script(self, script: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Execute a JavaScript script.
+        
+        Args:
+            script (str): The JavaScript script to execute.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.    
+        
+        Returns:
+            None
+        """
+        try:
+            self.driver.execute_script(script)
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error executing script: {e}")
+
+    def press_key(self, key: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Press a key on the keyboard.
+        
+        Args:
+            key (str): The key to press.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.send_keys(key).perform()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error pressing key: {e}")
+
+    def key_down(self, key: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Send a key down event.
+        
+        Args:
+            key (str): The key to send down.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.key_down(key).perform()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error sending key down: {e}")
+
+    def key_up(self, key: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Send a key up event.
+        
+        Args:
+            key (str): The key to send up.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.key_up(key).perform()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error sending key up: {e}")
+
+    def click_key(self, key: str, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Click a key (key down and key up).
+        
+        Args:
+            key (str): The key to click.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.key_down(key).key_up(key).perform()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error clicking key: {e}")
