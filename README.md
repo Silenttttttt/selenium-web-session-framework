@@ -124,16 +124,6 @@ session.close()
   - `timeout`: The maximum time to wait for the element.
   - Returns the extracted data, or `None` if extraction fails.
 
-### Running JavaScript
-
-- **run_js(selector_type: SelectorType, selector: str, script: str, skip_wait: bool = False, timeout: int = 10) -> Optional[Any]**: Run JavaScript on an element.
-  - `selector_type`: The type of selector (XPATH or CSS).
-  - `selector`: The selector string.
-  - `script`: The JavaScript code to run.
-  - `skip_wait`: Whether to skip waiting for the element.
-  - `timeout`: The maximum time to wait for the element.
-  - Returns the result of the JavaScript execution, or `None` if execution fails.
-
 ### Getting Page Information
 
 - **get_page_title() -> Optional[str]**: Get the title of the page.
