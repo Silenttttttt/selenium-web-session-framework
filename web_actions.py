@@ -103,6 +103,13 @@ class WebSession:
         
         atexit.register(self.close)
 
+    def __del__(self):
+        """Clean up resources when the object is destroyed."""
+        try:
+            self.driver.quit()
+        except Exception:
+            pass
+
     def close(self) -> bool:
         """
         Close the browser session.
