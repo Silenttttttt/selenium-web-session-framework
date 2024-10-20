@@ -196,9 +196,9 @@ class WebSession:
             return []
 
 
-    def find_element(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False) -> Optional[WebElement]:
+    def find_element(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False, timeout: int = None) -> Optional[WebElement]:
         """
-        Find a single element using various selector types.
+        Find a single element using various selector types with an optional timeout.
         
         Args:
             selector_type (SelectorType): The type of selector (XPATH, CSS, ID, NAME, CLASS_NAME, TAG_NAME, LINK_TEXT, PARTIAL_LINK_TEXT).
@@ -206,49 +206,92 @@ class WebSession:
             element (WebElement): The WebElement object to search within.
             suppress_traceback (bool): Whether to suppress the traceback print.
             raise_exc (bool): Whether to re-raise the exception.
+            timeout (int): The time to wait for the element, if not given, no timeout will be used.
         
         Returns:
             WebElement: The found element, or None if not found.
         """
         try:
             if element:
-                if selector_type == SelectorType.XPATH:
-                    return element.find_element(By.XPATH, selector)
-                elif selector_type == SelectorType.CSS:
-                    return element.find_element(By.CSS_SELECTOR, selector)
-                elif selector_type == SelectorType.ID:
-                    return element.find_element(By.ID, selector)
-                elif selector_type == SelectorType.NAME:
-                    return element.find_element(By.NAME, selector)
-                elif selector_type == SelectorType.CLASS_NAME:
-                    return element.find_element(By.CLASS_NAME, selector)
-                elif selector_type == SelectorType.TAG_NAME:
-                    return element.find_element(By.TAG_NAME, selector)
-                elif selector_type == SelectorType.LINK_TEXT:
-                    return element.find_element(By.LINK_TEXT, selector)
-                elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
-                    return element.find_element(By.PARTIAL_LINK_TEXT, selector)
+                if timeout:
+                    wait = WebDriverWait(element, timeout)
+                    if selector_type == SelectorType.XPATH:
+                        return wait.until(EC.presence_of_element_located((By.XPATH, selector)))
+                    elif selector_type == SelectorType.CSS:
+                        return wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+                    elif selector_type == SelectorType.ID:
+                        return wait.until(EC.presence_of_element_located((By.ID, selector)))
+                    elif selector_type == SelectorType.NAME:
+                        return wait.until(EC.presence_of_element_located((By.NAME, selector)))
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return wait.until(EC.presence_of_element_located((By.CLASS_NAME, selector)))
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return wait.until(EC.presence_of_element_located((By.TAG_NAME, selector)))
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return wait.until(EC.presence_of_element_located((By.LINK_TEXT, selector)))
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return wait.until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, selector)))
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
                 else:
-                    raise ValueError(f"Unsupported selector type: {selector_type}")
+                    if selector_type == SelectorType.XPATH:
+                        return element.find_element(By.XPATH, selector)
+                    elif selector_type == SelectorType.CSS:
+                        return element.find_element(By.CSS_SELECTOR, selector)
+                    elif selector_type == SelectorType.ID:
+                        return element.find_element(By.ID, selector)
+                    elif selector_type == SelectorType.NAME:
+                        return element.find_element(By.NAME, selector)
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return element.find_element(By.CLASS_NAME, selector)
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return element.find_element(By.TAG_NAME, selector)
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return element.find_element(By.LINK_TEXT, selector)
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return element.find_element(By.PARTIAL_LINK_TEXT, selector)
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
             else:
-                if selector_type == SelectorType.XPATH:
-                    return self.driver.find_element(By.XPATH, selector)
-                elif selector_type == SelectorType.CSS:
-                    return self.driver.find_element(By.CSS_SELECTOR, selector)
-                elif selector_type == SelectorType.ID:
-                    return self.driver.find_element(By.ID, selector)
-                elif selector_type == SelectorType.NAME:
-                    return self.driver.find_element(By.NAME, selector)
-                elif selector_type == SelectorType.CLASS_NAME:
-                    return self.driver.find_element(By.CLASS_NAME, selector)
-                elif selector_type == SelectorType.TAG_NAME:
-                    return self.driver.find_element(By.TAG_NAME, selector)
-                elif selector_type == SelectorType.LINK_TEXT:
-                    return self.driver.find_element(By.LINK_TEXT, selector)
-                elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
-                    return self.driver.find_element(By.PARTIAL_LINK_TEXT, selector)
+                if timeout:
+                    wait = WebDriverWait(self.driver, timeout)
+                    if selector_type == SelectorType.XPATH:
+                        return wait.until(EC.presence_of_element_located((By.XPATH, selector)))
+                    elif selector_type == SelectorType.CSS:
+                        return wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+                    elif selector_type == SelectorType.ID:
+                        return wait.until(EC.presence_of_element_located((By.ID, selector)))
+                    elif selector_type == SelectorType.NAME:
+                        return wait.until(EC.presence_of_element_located((By.NAME, selector)))
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return wait.until(EC.presence_of_element_located((By.CLASS_NAME, selector)))
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return wait.until(EC.presence_of_element_located((By.TAG_NAME, selector)))
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return wait.until(EC.presence_of_element_located((By.LINK_TEXT, selector)))
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return wait.until(EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, selector)))
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
                 else:
-                    raise ValueError(f"Unsupported selector type: {selector_type}")
+                    if selector_type == SelectorType.XPATH:
+                        return self.driver.find_element(By.XPATH, selector)
+                    elif selector_type == SelectorType.CSS:
+                        return self.driver.find_element(By.CSS_SELECTOR, selector)
+                    elif selector_type == SelectorType.ID:
+                        return self.driver.find_element(By.ID, selector)
+                    elif selector_type == SelectorType.NAME:
+                        return self.driver.find_element(By.NAME, selector)
+                    elif selector_type == SelectorType.CLASS_NAME:
+                        return self.driver.find_element(By.CLASS_NAME, selector)
+                    elif selector_type == SelectorType.TAG_NAME:
+                        return self.driver.find_element(By.TAG_NAME, selector)
+                    elif selector_type == SelectorType.LINK_TEXT:
+                        return self.driver.find_element(By.LINK_TEXT, selector)
+                    elif selector_type == SelectorType.PARTIAL_LINK_TEXT:
+                        return self.driver.find_element(By.PARTIAL_LINK_TEXT, selector)
+                    else:
+                        raise ValueError(f"Unsupported selector type: {selector_type}")
         except Exception:
             if raise_exc:
                 raise
@@ -258,7 +301,7 @@ class WebSession:
             return None
 
 
-    def find_elements(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False, timeout: int = 10, use_timeout: bool = False) -> List[WebElement]:
+    def find_elements(self, selector_type: SelectorType, selector: str, element: Optional[WebElement] = None, suppress_traceback: bool = False, raise_exc: bool = False, timeout: int = None) -> List[WebElement]:
         """
         Find elements using various selector types.
         
@@ -268,15 +311,15 @@ class WebSession:
             element (WebElement): The WebElement object to search within.
             suppress_traceback (bool): Whether to suppress the traceback print.
             raise_exc (bool): Whether to re-raise the exception.
-            timeout (int): The maximum time to wait for the elements.
-            use_timeout (bool): Whether to use the timeout for waiting for elements.
+            timeout (int): The time to wait for the elements, if not given, no timeout will be used
+        
         
         Returns:
             list: A list of found elements, or an empty list if none are found.
         """
         try:
             if element:
-                if use_timeout:
+                if timeout:
                     wait = WebDriverWait(element, timeout)
                     if selector_type == SelectorType.XPATH:
                         return wait.until(EC.presence_of_all_elements_located((By.XPATH, selector)))
@@ -316,7 +359,7 @@ class WebSession:
                     else:
                         raise ValueError(f"Unsupported selector type: {selector_type}")
             else:
-                if use_timeout:
+                if timeout:
                     wait = WebDriverWait(self.driver, timeout)
                     if selector_type == SelectorType.XPATH:
                         return wait.until(EC.presence_of_all_elements_located((By.XPATH, selector)))
@@ -990,6 +1033,10 @@ class WebSession:
             raise_exc (bool): Whether to re-raise the exception.
         """
         try:
+            if elements is None:
+                print("No elements provided for structure visualization.")
+                return
+
             output = []
             element_id = 0
 
