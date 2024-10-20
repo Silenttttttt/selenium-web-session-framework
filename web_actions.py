@@ -90,10 +90,13 @@ class WebSession:
         chrome_options = webdriver.ChromeOptions()
         if options:
             for key, value in options.items():
+                # Ensure the key is prefixed with '--'
+                prefixed_key = key if key.startswith("--") else f"--{key}"
+                
                 if isinstance(value, bool) and value:
-                    chrome_options.add_argument(f"--{key}")
+                    chrome_options.add_argument(prefixed_key)
                 elif isinstance(value, str):
-                    chrome_options.add_argument(f"--{key}={value}")
+                    chrome_options.add_argument(f"{prefixed_key}={value}")
                 # Add more specific handling as needed
 
         if use_undetected and uc_installed:
