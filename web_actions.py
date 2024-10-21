@@ -677,7 +677,7 @@ class WebSession:
                 print(clean_traceback(error_traceback))
             return False
 
-    def extract(self, element: Optional[WebElement] = None, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> Optional[str]:
+    def extract(self, selector_type: Optional[SelectorType] = None, selector: Optional[str] = None, element: Optional[WebElement] = None, attribute: Optional[str] = None, skip_wait: bool = False, timeout: int = 10, suppress_traceback: bool = False, raise_exc: bool = False) -> Optional[str]:
         """
         Extract data from an element.
         
@@ -1824,3 +1824,39 @@ class WebSession:
                 error_traceback = format_deeper_traceback()
                 print(clean_traceback(error_traceback))
             print(f"Error clicking key: {e}")
+
+    def click_at_coordinates(self, x: int, y: int, suppress_traceback: bool = False, raise_exc: bool = False) -> None:
+        """
+        Click at specific coordinates using ActionChains.
+        
+        Args:
+            x (int): The x-coordinate to click at.
+            y (int): The y-coordinate to click at.
+            suppress_traceback (bool): Whether to suppress the traceback print.
+            raise_exc (bool): Whether to re-raise the exception.
+        
+        Returns:
+            None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.move_by_offset(x, y).click().perform()
+            # Reset the mouse position to avoid offset issues in subsequent actions
+            actions.move_by_offset(-x, -y).perform()
+        except Exception as e:
+            if raise_exc:
+                raise
+            if not suppress_traceback:
+                error_traceback = format_deeper_traceback()
+                print(clean_traceback(error_traceback))
+            print(f"Error clicking at coordinates: {e}")
+
+    def get_window_size(self, suppress_traceback: bool = False, raise_exc: bool = False) -> dict:
+        """
+        Get the current window size.
+        """
+        try:
+            return self.driver.get_window_size()
+        except Exception as e:
+            if raise_exc:
+                raise
