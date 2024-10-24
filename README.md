@@ -155,4 +155,4 @@ session.close()
 
 ## Examples
 
-Refer to the `script_tests.py` file for example usage of the framework. The file contains various examples demonstrating how to use the methods provided by the `WebSession` class
+Refer to the `script_tests.py` file for example usage of the framework. The file contains various examples demonstrating how to use the methods provided by the `WebSession` class/
