@@ -153,6 +153,9 @@ session.close()
   - `timeout`: The maximum time to wait for the element.
   - Returns `True` if the scroll is successful, `False` otherwise.
 
+
+## The rest of documentation can be found in the doc strings
+
 ## Examples
 
 Refer to the `script_tests.py` file for example usage of the framework. The file contains various examples demonstrating how to use the methods provided by the `WebSession` class/
