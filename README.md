@@ -154,7 +154,7 @@ session.close()
   - Returns `True` if the scroll is successful, `False` otherwise.
 
 
-## The up to date, and complete documentation can be found in the Docstrings
+## The up to date, and complete documentation can be found in the Docstrings.
 
 ## Examples
 
